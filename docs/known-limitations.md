@@ -11,3 +11,7 @@ The analyzer includes conservative Spring REST and dependency-injection,
 JPA entity/table, and HTTP/messaging call detection. URLs, Kafka topics,
 proxy-generated beans, reflection, and runtime configuration are not resolved
 without additional build or runtime metadata.
+
+Streamable-HTTP mode is intentionally opt-in and token-protected. The filter
+is a small deployment boundary, not a full identity provider: use TLS,
+short-lived credentials, rate limits, and a reverse proxy for remote access.

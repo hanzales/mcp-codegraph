@@ -28,6 +28,23 @@ Configure a repository path through the `scan_project` MCP tool. The server is
 read-only and uses the in-memory graph by default. Logs go to stderr when STDIO
 is enabled so stdout remains reserved for MCP protocol messages.
 
+## Streamable HTTP mode
+
+STDIO remains the default. To run the optional WebMVC Streamable-HTTP
+transport, configure a token and start the HTTP profile:
+
+```bash
+export CODEGRAPH_MCP_TOKEN="replace-with-a-long-random-token"
+mvn -pl codegraph-server -am spring-boot:run \
+  -Dspring-boot.run.profiles=http
+```
+
+The endpoint is `http://127.0.0.1:8080/mcp`. Requests require
+`Authorization: Bearer $CODEGRAPH_MCP_TOKEN`; browser `Origin` values are
+restricted to `CODEGRAPH_MCP_ALLOWED_ORIGINS` (localhost by default). Bind to
+localhost unless a separate authenticated reverse proxy, TLS, and network
+policy protect a remote deployment.
+
 ## MCP tools in the MVP
 
 `scan_project`, `get_project_summary`, `get_index_status`, `search_symbols`,

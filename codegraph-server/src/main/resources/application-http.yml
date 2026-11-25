@@ -1,0 +1,19 @@
+spring:
+  main:
+    web-application-type: servlet
+  ai:
+    mcp:
+      server:
+        protocol: STREAMABLE
+        stdio: false
+        streamable-http:
+          mcp-endpoint: /mcp
+server:
+  address: 127.0.0.1
+  port: 8080
+codegraph:
+  transport: streamable-http
+  http:
+    # Set CODEGRAPH_MCP_TOKEN before starting; empty tokens are rejected.
+    auth-token: ${CODEGRAPH_MCP_TOKEN:}
+    allowed-origins: ${CODEGRAPH_MCP_ALLOWED_ORIGINS:http://localhost:8080}
