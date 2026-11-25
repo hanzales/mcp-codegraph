@@ -9,11 +9,11 @@ application, build scripts, SQL, or commands found in source files.
 
 ## Status
 
-This repository contains a working Java 21 MVP. It currently provides Java AST
-indexing, an in-memory graph provider, bounded dependency/impact traversal, and a
-Spring AI MCP server with STDIO transport. Neo4j persistence, richer framework
-detectors, Git diff indexing, and additional transports are tracked in the
-roadmap rather than being claimed as complete.
+This repository contains a working Java 21 MVP. It provides Java AST indexing,
+an in-memory graph provider, bounded dependency/impact traversal, Spring REST
+and dependency-injection detection, JPA mappings, conservative HTTP/messaging
+integration detection, Git diff analysis, and a Spring AI MCP server with STDIO
+transport. Neo4j persistence and additional transports remain in the roadmap.
 
 ## Quick start
 

@@ -28,20 +28,24 @@ class JavaLanguageAnalyzerTest {
                 import jakarta.persistence.Entity;
                 import jakarta.persistence.Table;
                 import jakarta.persistence.ManyToOne;
+                import org.springframework.boot.context.properties.ConfigurationProperties;
                 @Service class OrderService {
                   @Autowired PaymentService payment;
                   KafkaTemplate kafkaTemplate;
-                  String save(Order order) { kafkaTemplate.send(order); return "ok"; }
+                  String save(Order order) { payment.send(order); kafkaTemplate.send(order); return "ok"; }
                 }
                 @Entity @Table(name=\"orders\") class Order { @ManyToOne Customer customer; }
                 class PaymentService { void send(Order order) {} }
                 class Customer {}
+                @ConfigurationProperties(prefix="payments") class PaymentProperties { String url; }
                 """);
         var result = new JavaLanguageAnalyzer().analyze(root, List.of(file));
         assertTrue(result.nodes().stream().anyMatch(n -> n.kind() == NodeKind.DATABASE_ENTITY && n.name().equals("Order")));
         assertTrue(result.nodes().stream().anyMatch(n -> n.kind() == NodeKind.DATABASE_TABLE && n.name().equals("orders")));
         assertTrue(result.nodes().stream().anyMatch(n -> n.kind() == NodeKind.EXTERNAL_SERVICE));
+        assertTrue(result.nodes().stream().anyMatch(n -> n.kind() == NodeKind.CONFIGURATION && n.attributes().get("prefix").equals("payments")));
         assertTrue(result.relationships().stream().anyMatch(r -> r.type().equals("INJECTS")));
         assertTrue(result.relationships().stream().anyMatch(r -> r.type().equals("RELATES_TO")));
+        assertTrue(result.relationships().stream().anyMatch(r -> r.type().equals("CALLS") && r.confidence() == io.github.hanzales.codegraph.core.Confidence.HIGH));
     }
 }

@@ -1,11 +1,16 @@
 package io.github.hanzales.codegraph.analyzer;
 
-import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import io.github.hanzales.codegraph.core.*;
 import java.io.IOException;
 import java.nio.file.*;
@@ -17,14 +22,16 @@ public final class JavaLanguageAnalyzer implements LanguageAnalyzer {
     public String language() { return "java"; }
     public AnalysisResult analyze(Path root, List<Path> sourceFiles) {
         var nodes = new ArrayList<GraphNode>(); var edges = new ArrayList<GraphRelationship>(); var warnings = new ArrayList<AnalysisWarning>();
+        var typeSolver = new CombinedTypeSolver(new ReflectionTypeSolver(), new JavaParserTypeSolver(root));
+        var parser = new JavaParser(new ParserConfiguration().setSymbolResolver(new JavaSymbolSolver(typeSolver)));
         for (var file : sourceFiles) {
-            try { analyzeFile(root, file, nodes, edges, warnings); }
+            try { analyzeFile(root, file, parser, nodes, edges, warnings); }
             catch (RuntimeException | IOException ex) { warnings.add(new AnalysisWarning("JAVA_PARSE", ex.getMessage(), new SourceLocation(root.relativize(file).toString(), 1, 1))); }
         }
         return new AnalysisResult(nodes, edges, warnings);
     }
-    private void analyzeFile(Path root, Path file, List<GraphNode> nodes, List<GraphRelationship> edges, List<AnalysisWarning> warnings) throws IOException {
-        var relative = root.relativize(file).toString().replace('\\', '/'); var unit = StaticJavaParser.parse(file); var pkg = unit.getPackageDeclaration().map(p -> p.getNameAsString()).orElse("");
+    private void analyzeFile(Path root, Path file, JavaParser parser, List<GraphNode> nodes, List<GraphRelationship> edges, List<AnalysisWarning> warnings) throws IOException {
+        var relative = root.relativize(file).toString().replace('\\', '/'); var unit = parser.parse(file).getResult().orElseThrow(); var pkg = unit.getPackageDeclaration().map(p -> p.getNameAsString()).orElse("");
         for (var declaration : unit.findAll(ClassOrInterfaceDeclaration.class)) {
             var kind = declaration.isInterface() ? NodeKind.INTERFACE : NodeKind.CLASS; var qualified = pkg.isBlank() ? declaration.getNameAsString() : pkg + "." + declaration.getNameAsString(); var classId = id("class", qualified);
             var classAttributes = new HashMap<String, String>(); classAttributes.put("language", "java");
@@ -43,11 +50,15 @@ public final class JavaLanguageAnalyzer implements LanguageAnalyzer {
             for (var constructor : declaration.getConstructors()) { var methodId = id("constructor", qualified + "#" + constructor.getSignature()); add(nodes, new GraphNode(methodId, NodeKind.CONSTRUCTOR, constructor.getNameAsString(), qualified + "#" + constructor.getSignature(), relative, line(constructor), end(constructor), annotations(constructor.getAnnotations()))); edge(edges, classId, methodId, "DECLARES", relative, constructor, Confidence.HIGH, "constructor declaration"); for (var parameter : constructor.getParameters()) inject(edges, classId, parameter.getType().asString(), relative, parameter, "Spring constructor injection"); }
             for (var annotation : declaration.getAnnotations()) detectFrameworkNode(qualified, classId, annotation, relative, nodes, edges);
             detectJpaEntity(qualified, classId, declaration, relative, nodes, edges);
+            detectConfiguration(qualified, classId, declaration, relative, nodes, edges);
         }
     }
     private void analyzeMethod(String qualified, String classId, MethodDeclaration method, String file, List<GraphNode> nodes, List<GraphRelationship> edges) {
         var signature = qualified + "#" + method.getSignature(); var methodId = id("method", signature); add(nodes, new GraphNode(methodId, NodeKind.METHOD, method.getNameAsString(), signature, file, line(method), end(method), annotations(method.getAnnotations()))); edge(edges, classId, methodId, "DECLARES", file, method, Confidence.HIGH, "method declaration");
-        method.findAll(MethodCallExpr.class).forEach(call -> edge(edges, methodId, id("method", call.getNameAsString()), "CALLS", file, call, Confidence.LOW, "unresolved method call"));
+        method.findAll(MethodCallExpr.class).forEach(call -> {
+            try { var resolved = call.resolve(); edge(edges, methodId, id("method", resolved.getQualifiedSignature()), "CALLS", file, call, Confidence.HIGH, "JavaSymbolSolver resolved method call"); }
+            catch (RuntimeException ex) { edge(edges, methodId, id("method", call.getNameAsString()), "CALLS", file, call, Confidence.LOW, "unresolved method call"); }
+        });
         method.findAll(MethodCallExpr.class).forEach(call -> detectIntegrationCall(methodId, call, file, nodes, edges));
         for (var annotation : method.getAnnotations()) detectFrameworkNode(signature, methodId, annotation, file, nodes, edges);
         for (var parameter : method.getParameters()) for (var annotation : parameter.getAnnotations()) detectFrameworkNode(signature + "#" + parameter.getNameAsString(), methodId, annotation, file, nodes, edges);
@@ -64,6 +75,13 @@ public final class JavaLanguageAnalyzer implements LanguageAnalyzer {
         var table = declaration.getAnnotationByName("Table").map(this::annotationValue).orElse(declaration.getNameAsString()); var tableId = id("table", table); add(nodes, new GraphNode(tableId, NodeKind.DATABASE_TABLE, table, table, file, line(declaration), end(declaration), Map.of("name", table))); edge(edges, entityId, tableId, "MAPS_TO", file, entity.get(), Confidence.MEDIUM, "JPA table mapping");
     }
     private void detectJpaField(String owner, FieldDeclaration field, String fieldId, String file, List<GraphNode> nodes, List<GraphRelationship> edges) { for (var annotation : field.getAnnotations()) if (Set.of("OneToMany", "ManyToOne", "OneToOne", "ManyToMany").contains(annotation.getNameAsString())) edge(edges, fieldId, id("class", field.getVariable(0).getType().asString()), "RELATES_TO", file, annotation, Confidence.MEDIUM, "JPA relationship annotation"); }
+    private void detectConfiguration(String qualified, String classId, ClassOrInterfaceDeclaration declaration, String file, List<GraphNode> nodes, List<GraphRelationship> edges) {
+        var properties = declaration.getAnnotationByName("ConfigurationProperties");
+        if (properties.isEmpty()) return;
+        var prefix = annotationValue(properties.get()); var configurationId = id("configuration", qualified);
+        add(nodes, new GraphNode(configurationId, NodeKind.CONFIGURATION, declaration.getNameAsString(), qualified, file, line(declaration), end(declaration), Map.of("prefix", prefix)));
+        edge(edges, classId, configurationId, "CONFIGURES", file, properties.get(), Confidence.HIGH, "Spring @ConfigurationProperties binding");
+    }
     private void inject(List<GraphRelationship> edges, String source, String targetType, String file, com.github.javaparser.ast.Node node, String evidence) { edge(edges, source, id("class", targetType.replaceAll("[<>].*", "")), "INJECTS", file, node, Confidence.MEDIUM, evidence); }
     private void detectIntegrationCall(String methodId, MethodCallExpr call, String file, List<GraphNode> nodes, List<GraphRelationship> edges) {
         var name = call.getNameAsString(); var scope = call.getScope().map(Object::toString).orElse("").toLowerCase(Locale.ROOT);
@@ -76,6 +94,7 @@ public final class JavaLanguageAnalyzer implements LanguageAnalyzer {
     private String annotationValue(AnnotationExpr annotation) {
         var value = annotation.toString().replaceAll("^@\\w+\\s*", "").replaceAll("[{}\" ]", "");
         if (value.contains("name=")) value = value.substring(value.indexOf("name=") + 5);
+        if (value.contains("prefix=")) value = value.substring(value.indexOf("prefix=") + 7);
         return value.replaceFirst("^value=", "").replaceAll("^[()]|[()]$", "").split(",", 2)[0];
     }
     private static Map<String, String> annotations(List<AnnotationExpr> annotations) { var map = new HashMap<String, String>(); annotations.forEach(a -> map.put("annotation:" + a.getNameAsString(), "true")); return map; }
