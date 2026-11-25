@@ -28,4 +28,8 @@ public final class CodeGraphTools {
     public Map<String, Object> getProjectSummary() { return service.summary(); }
     @Tool(description = "List statically detected Spring HTTP API endpoints.")
     public List<GraphNode> getApiEndpoints(int limit) { return service.getApiEndpoints(limit); }
+    @Tool(description = "Analyze working tree, staged, or two Git revisions without modifying the repository. Reports changed Java methods/classes and source ranges.")
+    public GitDiffReport analyzeGitDiff(String repositoryPath, boolean staged, String baseRevision, String targetRevision) throws Exception {
+        return service.analyzeGitDiff(repositoryPath, staged, baseRevision, targetRevision);
+    }
 }

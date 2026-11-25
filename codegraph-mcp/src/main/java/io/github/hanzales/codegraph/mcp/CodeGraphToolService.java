@@ -9,6 +9,7 @@ import java.util.*;
 /** Application service used by MCP adapters. It never executes repository code. */
 public final class CodeGraphToolService {
     private final GraphRepository graph; private final ProjectIndexer indexer; private IndexStatus status;
+    private final io.github.hanzales.codegraph.indexer.GitDiffAnalyzer diffAnalyzer = new io.github.hanzales.codegraph.indexer.GitDiffAnalyzer();
     public CodeGraphToolService(GraphRepository graph, ProjectIndexer indexer) { this.graph = graph; this.indexer = indexer; }
     public synchronized IndexStatus scanProject(String path) throws Exception { status = indexer.index(Path.of(path)); return status; }
     public IndexStatus getIndexStatus() { return status; }
@@ -19,4 +20,8 @@ public final class CodeGraphToolService {
     public ImpactResult analyzeImpact(String id, int maxDepth, int maxResults) { return new GraphImpactAnalyzer(graph).analyze(id, Math.min(maxDepth, 20), Math.min(maxResults, 200)); }
     public Map<String, Object> summary() { return Map.of("nodes", graph.nodes().size(), "relationships", graph.relationships().size(), "indexed", status != null); }
     public List<GraphNode> getApiEndpoints(int limit) { return graph.nodes().stream().filter(n -> n.kind() == NodeKind.API_ENDPOINT).limit(limit).toList(); }
+    public GitDiffReport analyzeGitDiff(String path, boolean staged, String base, String target) throws Exception {
+        if (base != null && target != null) return diffAnalyzer.commits(Path.of(path), base, target);
+        return diffAnalyzer.workingTree(Path.of(path), staged);
+    }
 }
