@@ -4,5 +4,6 @@
   <dependencies>
     <dependency><groupId>io.github.hanzales</groupId><artifactId>codegraph-core</artifactId><version>${project.version}</version></dependency>
     <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter</artifactId><scope>test</scope></dependency>
+    <dependency><groupId>org.neo4j.driver</groupId><artifactId>neo4j-java-driver</artifactId><version>${neo4j-driver.version}</version></dependency>
   </dependencies>
 </project>

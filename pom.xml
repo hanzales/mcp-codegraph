@@ -26,6 +26,7 @@
     <jgit.version>6.10.0.202406032230-r</jgit.version>
     <spring-boot.version>3.5.6</spring-boot.version>
     <spring-ai.version>1.0.9</spring-ai.version>
+    <neo4j-driver.version>6.3.0</neo4j-driver.version>
   </properties>
   <dependencyManagement>
     <dependencies>
