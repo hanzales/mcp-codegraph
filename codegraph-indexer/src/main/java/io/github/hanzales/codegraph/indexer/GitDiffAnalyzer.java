@@ -9,8 +9,6 @@ import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
-import org.eclipse.jgit.treewalk.FileTreeIterator;
-import org.eclipse.jgit.dircache.DirCacheIterator;
 import org.eclipse.jgit.api.Git;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.*;
