@@ -6,3 +6,8 @@ code, or deleted declarations from the current source tree. A Neo4j provider is 
 requires an explicitly configured Neo4j instance. There is no guarantee that a
 statically detected relationship runs at runtime. Generated code, reflection,
 dynamic SQL, and runtime configuration can be missed.
+
+The analyzer includes conservative Spring REST and dependency-injection,
+JPA entity/table, and HTTP/messaging call detection. URLs, Kafka topics,
+proxy-generated beans, reflection, and runtime configuration are not resolved
+without additional build or runtime metadata.
