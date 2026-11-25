@@ -1,0 +1,13 @@
+spring:
+  main:
+    web-application-type: none
+  ai:
+    mcp:
+      server:
+        name: mcp-codegraph
+        version: 0.1.0
+        type: SYNC
+        stdio: true
+codegraph:
+  security:
+    redact-secrets: true
