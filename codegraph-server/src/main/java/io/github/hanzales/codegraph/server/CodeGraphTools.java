@@ -48,6 +48,8 @@ public final class CodeGraphTools {
     public WorkspaceIndexStatus getWorkspaceIndexStatus(String workspaceId) { return service.getWorkspaceIndexStatus(workspaceId); }
     @Tool(description = "List repositories registered in a workspace.")
     public List<RepositoryDefinition> getWorkspaceRepositories(String workspaceId) { return service.getWorkspaceRepositories(workspaceId); }
+    @Tool(description = "Return detailed statistics from the last FULL, INCREMENTAL, or AUTO indexing run.")
+    public Optional<IncrementalIndexStatistics> getIncrementalIndexStatistics(String workspaceId, String repositoryId) { return service.getIncrementalIndexStatistics(workspaceId, repositoryId); }
     @Tool(description = "Search symbols across isolated repositories in a workspace. Returned IDs are workspace-namespaced.")
     public List<GraphNode> searchWorkspaceSymbols(String workspaceId, String query, int limit) { return service.searchWorkspaceSymbols(workspaceId, query, limit); }
     @Tool(description = "Search symbols within one repository only, without leaking results from other repositories or workspaces.")

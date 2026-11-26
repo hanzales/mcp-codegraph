@@ -36,6 +36,7 @@ public final class CodeGraphToolService {
     public List<RepositoryIndexStatus> indexWorkspace(String workspaceId) { return requireWorkspaceService().indexWorkspace(workspaceId); }
     public WorkspaceIndexStatus getWorkspaceIndexStatus(String workspaceId) { return requireWorkspaceService().status(workspaceId); }
     public List<RepositoryDefinition> getWorkspaceRepositories(String workspaceId) { return requireWorkspaceService().repositories(workspaceId); }
+    public Optional<IncrementalIndexStatistics> getIncrementalIndexStatistics(String workspaceId, String repositoryId) { return requireWorkspaceService().incrementalStatistics(workspaceId, repositoryId); }
     public List<GraphNode> searchWorkspaceSymbols(String workspaceId, String query, int limit) { return requireWorkspaceService().searchWorkspace(workspaceId, query, Math.min(Math.max(limit, 1), 100)); }
     public List<GraphNode> searchRepositorySymbols(String workspaceId, String repositoryId, String query, int limit) { return requireWorkspaceService().searchRepository(workspaceId, repositoryId, query, Math.min(Math.max(limit, 1), 100)); }
     public List<RepositorySnapshotMetadata> getRepositorySnapshots(String workspaceId, String repositoryId) { return requireWorkspaceService().snapshots(workspaceId, repositoryId); }
