@@ -44,7 +44,7 @@ public class CodeGraphApplication {
             GraphStorageProperties properties) {
         if (!properties.providerName().equalsIgnoreCase("neo4j")) return new WorkspaceIndexService(policy, new DefaultLanguageAnalyzerSelector());
         var driver = driverProvider.getIfAvailable(() -> { throw new IllegalStateException("Neo4j provider selected but no driver is configured"); });
-        return new WorkspaceIndexService(policy, new DefaultLanguageAnalyzerSelector(), (workspace, repository) -> new Neo4jGraphRepository(driver, properties.databaseValue(), workspace, repository.repositoryId(), "working-tree"));
+        return new WorkspaceIndexService(policy, new DefaultLanguageAnalyzerSelector(), (workspace, repository, snapshot) -> new Neo4jGraphRepository(driver, properties.databaseValue(), workspace, repository.repositoryId(), snapshot), 3);
     }
     @Bean CodeGraphToolService codeGraphToolService(GraphRepository graph, ProjectIndexer indexer, WorkspaceIndexService workspaceIndexService) { return new CodeGraphToolService(graph, indexer, workspaceIndexService); }
     @Bean ToolCallbackProvider codeGraphToolCallbacks(CodeGraphTools tools) { return MethodToolCallbackProvider.builder().toolObjects(tools).build(); }

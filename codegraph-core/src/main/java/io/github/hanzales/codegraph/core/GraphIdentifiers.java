@@ -8,6 +8,7 @@ public final class GraphIdentifiers {
     private GraphIdentifiers() { }
     public static String repository(String canonicalRoot) { return "repo:" + digest(canonicalRoot); }
     public static String snapshot(String repositoryId, String revision) { return "snapshot:" + digest(repositoryId + "\u0000" + (revision == null ? "working-tree" : revision)); }
+    public static String indexingRun(String workspaceId, String repositoryId, long startedAtMillis) { return "run:" + digest(workspaceId + "\u0000" + repositoryId + "\u0000" + startedAtMillis); }
     public static String logical(String language, String qualifiedSymbol) { return language.toLowerCase() + ":" + qualifiedSymbol; }
     public static String node(String repositoryId, String snapshotId, String logicalId) { return "node:" + digest(repositoryId + "\u0000" + snapshotId + "\u0000" + logicalId); }
     public static String relationship(String sourceId, String targetId, String type) { return "rel:" + digest(sourceId + "\u0000" + targetId + "\u0000" + type); }

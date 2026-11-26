@@ -91,5 +91,10 @@ future work.
 **Completed storage foundation:** Neo4j is now an explicit interchangeable
 provider with scoped workspace/repository/snapshot keys, idempotent upserts,
 batch transactions, schema constraints/indexes, cleanup operations, statistics,
-health reporting, and explicit failure behavior. In-memory remains the default;
-durable workspace catalog persistence and revision-aware snapshots remain open.
+health reporting, and explicit failure behavior. In-memory remains the default.
+
+**Completed snapshot foundation:** Git/JGit metadata discovery, dirty-tree and
+non-Git content fingerprints, deterministic snapshot/run identities, immutable
+snapshot lifecycle, active selection, stale status, retention, comparison, and
+failure-safe activation are implemented. Durable workspace catalog persistence
+and cross-repository snapshot consistency remain future work.

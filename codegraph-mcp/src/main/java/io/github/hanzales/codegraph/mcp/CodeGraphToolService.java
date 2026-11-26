@@ -37,5 +37,9 @@ public final class CodeGraphToolService {
     public List<RepositoryDefinition> getWorkspaceRepositories(String workspaceId) { return requireWorkspaceService().repositories(workspaceId); }
     public List<GraphNode> searchWorkspaceSymbols(String workspaceId, String query, int limit) { return requireWorkspaceService().searchWorkspace(workspaceId, query, Math.min(Math.max(limit, 1), 100)); }
     public List<GraphNode> searchRepositorySymbols(String workspaceId, String repositoryId, String query, int limit) { return requireWorkspaceService().searchRepository(workspaceId, repositoryId, query, Math.min(Math.max(limit, 1), 100)); }
+    public List<RepositorySnapshotMetadata> getRepositorySnapshots(String workspaceId, String repositoryId) { return requireWorkspaceService().snapshots(workspaceId, repositoryId); }
+    public Optional<RepositorySnapshotMetadata> getActiveRepositorySnapshot(String workspaceId, String repositoryId) { return requireWorkspaceService().activeSnapshot(workspaceId, repositoryId); }
+    public RepositorySnapshotMetadata selectRepositorySnapshot(String workspaceId, String repositoryId, String snapshotId) { return requireWorkspaceService().selectActiveSnapshot(workspaceId, repositoryId, snapshotId); }
+    public SnapshotComparison compareRepositorySnapshots(String workspaceId, String repositoryId, String leftSnapshotId, String rightSnapshotId) { return requireWorkspaceService().compareSnapshots(workspaceId, repositoryId, leftSnapshotId, rightSnapshotId); }
     private WorkspaceIndexService requireWorkspaceService() { if (workspaceIndexService == null) throw new IllegalStateException("Workspace support is not configured"); return workspaceIndexService; }
 }

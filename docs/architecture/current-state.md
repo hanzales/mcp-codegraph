@@ -125,6 +125,14 @@ resolve dependencies across repository graphs.
 - `CodeGraphToolService` is reusable as an application-service layer, but should
   stop owning global mutable index state as multi-repository support arrives.
 
+## Snapshot versioning
+
+Repository graphs are scoped by immutable Git-aware snapshots. Clean commits,
+dirty working trees, and non-Git content receive distinct identities. Failed or
+partial runs never replace the active snapshot; status and query consumers can
+see stale information and compare retained snapshots. See
+`docs/architecture/snapshots.md` for identity and retention semantics.
+
 ## Security and compatibility findings
 
 - Source content is untrusted and must never become executable input. Existing

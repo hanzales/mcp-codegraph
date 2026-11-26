@@ -1,5 +1,10 @@
 # Neo4j graph storage
 
+Neo4j graph instances are constructed with workspace, repository, and immutable
+snapshot scope. This prevents a query from traversing relationships produced by
+different source states. The workspace indexer creates a new scoped provider for
+each run; a failed write is surfaced as an error and never falls back to memory.
+
 The in-memory provider remains the default. Select Neo4j explicitly with
 `CODEGRAPH_GRAPH_PROVIDER=neo4j`; the application does not silently fall back
 when Neo4j is unavailable.

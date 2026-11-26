@@ -50,4 +50,12 @@ public final class CodeGraphTools {
     public List<GraphNode> searchWorkspaceSymbols(String workspaceId, String query, int limit) { return service.searchWorkspaceSymbols(workspaceId, query, limit); }
     @Tool(description = "Search symbols within one repository only, without leaking results from other repositories or workspaces.")
     public List<GraphNode> searchRepositorySymbols(String workspaceId, String repositoryId, String query, int limit) { return service.searchRepositorySymbols(workspaceId, repositoryId, query, limit); }
+    @Tool(description = "List retained immutable snapshots, including Git commit, dirty state, source fingerprint, lifecycle, and stale metadata.")
+    public List<RepositorySnapshotMetadata> getRepositorySnapshots(String workspaceId, String repositoryId) { return service.getRepositorySnapshots(workspaceId, repositoryId); }
+    @Tool(description = "Return the active repository snapshot and whether its source state is stale.")
+    public Optional<RepositorySnapshotMetadata> getActiveRepositorySnapshot(String workspaceId, String repositoryId) { return service.getActiveRepositorySnapshot(workspaceId, repositoryId); }
+    @Tool(description = "Select a retained successful snapshot for repository-scoped queries; failed and partial snapshots cannot be selected.")
+    public RepositorySnapshotMetadata selectRepositorySnapshot(String workspaceId, String repositoryId, String snapshotId) { return service.selectRepositorySnapshot(workspaceId, repositoryId, snapshotId); }
+    @Tool(description = "Compare two retained graph snapshots by deterministic node and relationship sets.")
+    public SnapshotComparison compareRepositorySnapshots(String workspaceId, String repositoryId, String leftSnapshotId, String rightSnapshotId) { return service.compareRepositorySnapshots(workspaceId, repositoryId, leftSnapshotId, rightSnapshotId); }
 }
