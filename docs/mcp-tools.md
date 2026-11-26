@@ -27,3 +27,9 @@ Snapshot metadata includes branch, commit, dirty state, source fingerprint,
 analyzer/schema versions, indexing run ID, lifecycle status, and stale state.
 Failed and partial runs are queryable as metadata but never replace the last
 successful active snapshot.
+
+Repository indexing defaults to `AUTO` and can be requested as `FULL` or
+`INCREMENTAL` through `indexRepositoryWithMode`. Incompatible analyzer/schema or
+configuration versions automatically trigger a full rebuild. Incremental
+statistics are available from the indexer API; unresolved semantic dependencies
+are explicitly treated as a reason to prefer full indexing.

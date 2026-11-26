@@ -32,6 +32,7 @@ public final class CodeGraphToolService {
     public RepositoryDefinition registerRepository(String workspaceId, RepositoryDefinition definition) throws Exception { return requireWorkspaceService().registerRepository(workspaceId, definition); }
     public boolean removeRepository(String workspaceId, String repositoryId) { return requireWorkspaceService().removeRepository(workspaceId, repositoryId); }
     public RepositoryIndexStatus indexRepository(String workspaceId, String repositoryId) { return requireWorkspaceService().indexRepository(workspaceId, repositoryId); }
+    public RepositoryIndexStatus indexRepository(String workspaceId, String repositoryId, IndexingMode mode) { return requireWorkspaceService().indexRepository(workspaceId, repositoryId, mode); }
     public List<RepositoryIndexStatus> indexWorkspace(String workspaceId) { return requireWorkspaceService().indexWorkspace(workspaceId); }
     public WorkspaceIndexStatus getWorkspaceIndexStatus(String workspaceId) { return requireWorkspaceService().status(workspaceId); }
     public List<RepositoryDefinition> getWorkspaceRepositories(String workspaceId) { return requireWorkspaceService().repositories(workspaceId); }

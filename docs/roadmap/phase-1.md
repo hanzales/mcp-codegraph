@@ -98,3 +98,10 @@ non-Git content fingerprints, deterministic snapshot/run identities, immutable
 snapshot lifecycle, active selection, stale status, retention, comparison, and
 failure-safe activation are implemented. Durable workspace catalog persistence
 and cross-repository snapshot consistency remain future work.
+
+**Completed incremental indexing foundation:** Versioned source manifests,
+content-hash plans, add/modify/delete/rename detection, analyzer/schema/config
+compatibility checks, dependency-aware invalidation, reusable graph facts,
+statistics, cancellation/timeout hooks, and safe full fallback are implemented.
+Persistent manifests, fine-grained provider deletes, and cross-repository
+semantic invalidation remain future work.

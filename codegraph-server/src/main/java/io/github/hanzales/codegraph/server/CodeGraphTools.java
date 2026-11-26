@@ -40,6 +40,8 @@ public final class CodeGraphTools {
     public boolean removeRepository(String workspaceId, String repositoryId) { return service.removeRepository(workspaceId, repositoryId); }
     @Tool(description = "Index one registered repository using its selected language analyzer.")
     public RepositoryIndexStatus indexRepository(String workspaceId, String repositoryId) { return service.indexRepository(workspaceId, repositoryId); }
+    @Tool(description = "Index a repository using FULL, INCREMENTAL, or AUTO mode. AUTO safely falls back to a full rebuild when manifests or analyzer/schema versions are incompatible.")
+    public RepositoryIndexStatus indexRepositoryWithMode(String workspaceId, String repositoryId, IndexingMode mode) { return service.indexRepository(workspaceId, repositoryId, mode); }
     @Tool(description = "Index all registered repositories in a workspace and return independent statuses, including partial failures.")
     public List<RepositoryIndexStatus> indexWorkspace(String workspaceId) { return service.indexWorkspace(workspaceId); }
     @Tool(description = "Return workspace and per-repository indexing status.")
