@@ -80,10 +80,12 @@ collide across packages.
 
 ### Repository isolation
 
-The server owns one mutable `GraphRepository` and one mutable `IndexStatus`.
-Calling `scan_project` clears the graph. There is no concurrent multi-repository
-model, tenant boundary, per-request repository selection after indexing, or
-authorization check tied to a repository identity.
+The legacy server path still owns one mutable `GraphRepository` and one
+`IndexStatus`. The new `WorkspaceIndexService` adds process-local workspace and
+repository registries with one graph per repository, canonical allowed-root
+validation, independent statuses, and namespaced workspace search results. It
+does not yet persist registrations, provide distributed coordination, or
+resolve dependencies across repository graphs.
 
 ## Architectural limitations
 

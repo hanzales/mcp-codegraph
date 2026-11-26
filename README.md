@@ -45,6 +45,16 @@ restricted to `CODEGRAPH_MCP_ALLOWED_ORIGINS` (localhost by default). Bind to
 localhost unless a separate authenticated reverse proxy, TLS, and network
 policy protect a remote deployment.
 
+## Multi-repository workspaces
+
+The workspace registry groups local repositories without cloning or changing
+branches. Set `CODEGRAPH_SECURITY_ALLOWED_ROOTS` to a comma-separated list of
+trusted parent directories, then use `register_workspace` and
+`register_repository`. Each repository has its own graph and index status;
+`search_workspace_symbols` returns namespaced IDs. Java is currently the only
+implemented analyzer, so detected C#, JavaScript, TypeScript, and SQL
+repositories are reported as partial rather than analyzed speculatively.
+
 ## MCP tools in the MVP
 
 `scan_project`, `get_project_summary`, `get_index_status`, `search_symbols`,

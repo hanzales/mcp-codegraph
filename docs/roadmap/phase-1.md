@@ -38,8 +38,11 @@ frontends, or major transport changes.
 **Completed foundation:** Version 1 of the language-neutral graph interchange
 contract, repository/snapshot-scoped deterministic identifiers, structured
 evidence, resolution status, compatibility adapters, JSON Schema, and Java/C#
-examples are now available. Runtime indexing and provider namespace isolation
-remain future work.
+examples are now available. A process-local multi-repository workspace
+registry, allowed-root policy, analyzer selection, isolated graphs, and
+workspace/repository status queries are also available. Persistent catalog
+storage, incremental runtime indexing, and cross-repository resolution remain
+future work.
 
 ### 5. Graph access performance
 

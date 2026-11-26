@@ -32,4 +32,22 @@ public final class CodeGraphTools {
     public GitDiffReport analyzeGitDiff(String repositoryPath, boolean staged, String baseRevision, String targetRevision) throws Exception {
         return service.analyzeGitDiff(repositoryPath, staged, baseRevision, targetRevision);
     }
+    @Tool(description = "Register an isolated workspace that can contain multiple local repositories.")
+    public WorkspaceDefinition registerWorkspace(String workspaceId, String displayName) { return service.registerWorkspace(workspaceId, displayName); }
+    @Tool(description = "Register a local repository in a workspace. The path must be inside configured allowed roots; no repository is cloned or modified.")
+    public RepositoryDefinition registerRepository(String workspaceId, RepositoryDefinition repository) throws Exception { return service.registerRepository(workspaceId, repository); }
+    @Tool(description = "Remove a repository from a workspace without affecting other workspaces or repositories.")
+    public boolean removeRepository(String workspaceId, String repositoryId) { return service.removeRepository(workspaceId, repositoryId); }
+    @Tool(description = "Index one registered repository using its selected language analyzer.")
+    public RepositoryIndexStatus indexRepository(String workspaceId, String repositoryId) { return service.indexRepository(workspaceId, repositoryId); }
+    @Tool(description = "Index all registered repositories in a workspace and return independent statuses, including partial failures.")
+    public List<RepositoryIndexStatus> indexWorkspace(String workspaceId) { return service.indexWorkspace(workspaceId); }
+    @Tool(description = "Return workspace and per-repository indexing status.")
+    public WorkspaceIndexStatus getWorkspaceIndexStatus(String workspaceId) { return service.getWorkspaceIndexStatus(workspaceId); }
+    @Tool(description = "List repositories registered in a workspace.")
+    public List<RepositoryDefinition> getWorkspaceRepositories(String workspaceId) { return service.getWorkspaceRepositories(workspaceId); }
+    @Tool(description = "Search symbols across isolated repositories in a workspace. Returned IDs are workspace-namespaced.")
+    public List<GraphNode> searchWorkspaceSymbols(String workspaceId, String query, int limit) { return service.searchWorkspaceSymbols(workspaceId, query, limit); }
+    @Tool(description = "Search symbols within one repository only, without leaking results from other repositories or workspaces.")
+    public List<GraphNode> searchRepositorySymbols(String workspaceId, String repositoryId, String query, int limit) { return service.searchRepositorySymbols(workspaceId, repositoryId, query, limit); }
 }
