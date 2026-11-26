@@ -1,0 +1,53 @@
+{
+  "contract": "mcp-codegraph.graph",
+  "schemaVersion": 1,
+  "repositoryId": "repo:commerce-java",
+  "snapshotId": "snapshot:abc123",
+  "commitHash": "abc123",
+  "analyzer": { "name": "mcp-codegraph-java", "version": "0.1.0", "language": "java" },
+  "nodes": [
+    {
+      "id": "node:java-order-service",
+      "logicalId": "java:class:demo.OrderService",
+      "repositoryId": "repo:commerce-java",
+      "snapshotId": "snapshot:abc123",
+      "kind": "CLASS",
+      "name": "OrderService",
+      "qualifiedName": "demo.OrderService",
+      "language": "java",
+      "analyzer": "mcp-codegraph-java",
+      "analyzerVersion": "0.1.0",
+      "sourceRange": { "startLine": 1, "startColumn": 0, "endLine": 42, "endColumn": 1 },
+      "metadata": { "annotation:Service": "true" }
+    },
+    {
+      "id": "node:java-order-controller",
+      "logicalId": "java:class:demo.OrderController",
+      "repositoryId": "repo:commerce-java",
+      "snapshotId": "snapshot:abc123",
+      "kind": "CLASS",
+      "name": "OrderController",
+      "qualifiedName": "demo.OrderController",
+      "language": "java",
+      "analyzer": "mcp-codegraph-java",
+      "analyzerVersion": "0.1.0",
+      "sourceRange": { "startLine": 1, "startColumn": 0, "endLine": 25, "endColumn": 1 },
+      "metadata": { "annotation:RestController": "true" }
+    }
+  ],
+  "relationships": [
+    {
+      "id": "rel:controller-service",
+      "sourceId": "node:java-order-controller",
+      "targetId": "node:java-order-service",
+      "type": "INJECTS",
+      "resolution": "CONFIRMED",
+      "confidence": "HIGH",
+      "evidence": [
+        { "repositoryId": "repo:commerce-java", "commitHash": "abc123", "relativeFilePath": "src/main/java/demo/OrderController.java", "sourceRange": { "startLine": 8, "startColumn": 4, "endLine": 8, "endColumn": 60 }, "rationale": "Constructor parameter type resolves to OrderService" }
+      ],
+      "metadata": { "language": "java" }
+    }
+  ],
+  "metadata": { "source": "example" }
+}

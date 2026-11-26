@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/hanzales/mcp-codegraph/schema/graph-contract-v1.json",
+  "title": "MCP CodeGraph language-neutral graph contract",
+  "type": "object",
+  "required": ["contract", "schemaVersion", "repositoryId", "snapshotId", "commitHash", "analyzer", "nodes", "relationships"],
+  "properties": {
+    "contract": { "const": "mcp-codegraph.graph" },
+    "schemaVersion": { "const": 1 },
+    "repositoryId": { "type": "string", "minLength": 1 },
+    "snapshotId": { "type": "string", "minLength": 1 },
+    "commitHash": { "type": ["string", "null"] },
+    "analyzer": { "$ref": "#/$defs/stringMap" },
+    "nodes": { "type": "array", "items": { "$ref": "#/$defs/node" } },
+    "relationships": { "type": "array", "items": { "$ref": "#/$defs/relationship" } },
+    "metadata": { "type": "object", "additionalProperties": true }
+  },
+  "$defs": {
+    "stringMap": { "type": "object", "additionalProperties": { "type": "string" } },
+    "range": {
+      "type": "object",
+      "required": ["startLine", "startColumn", "endLine", "endColumn"],
+      "properties": {
+        "startLine": { "type": "integer", "minimum": 0 }, "startColumn": { "type": "integer", "minimum": 0 },
+        "endLine": { "type": "integer", "minimum": 0 }, "endColumn": { "type": "integer", "minimum": 0 }
+      }, "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["repositoryId", "commitHash", "relativeFilePath", "sourceRange", "rationale"],
+      "properties": {
+        "repositoryId": { "type": "string", "minLength": 1 }, "commitHash": { "type": "string", "minLength": 1 },
+        "relativeFilePath": { "type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+" },
+        "sourceRange": { "$ref": "#/$defs/range" }, "rationale": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "node": {
+      "type": "object",
+      "required": ["id", "logicalId", "repositoryId", "snapshotId", "kind", "name", "qualifiedName", "language", "analyzer", "analyzerVersion", "sourceRange", "metadata"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 }, "logicalId": { "type": "string", "minLength": 1 },
+        "repositoryId": { "type": "string", "minLength": 1 }, "snapshotId": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string", "minLength": 1 }, "name": { "type": "string" }, "qualifiedName": { "type": "string" },
+        "language": { "type": "string", "minLength": 1 }, "analyzer": { "type": "string", "minLength": 1 }, "analyzerVersion": { "type": "string", "minLength": 1 },
+        "sourceRange": { "$ref": "#/$defs/range" }, "metadata": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": false
+    },
+    "relationship": {
+      "type": "object",
+      "required": ["id", "sourceId", "targetId", "type", "resolution", "confidence", "evidence", "metadata"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 }, "sourceId": { "type": "string", "minLength": 1 }, "targetId": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "minLength": 1 }, "resolution": { "enum": ["CONFIRMED", "INFERRED", "UNRESOLVED"] },
+        "confidence": { "enum": ["HIGH", "MEDIUM", "LOW", "UNRESOLVED"] }, "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } },
+        "metadata": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -35,6 +35,12 @@ frontends, or major transport changes.
 - Add resolution status and reason codes for unresolved relationships.
 - Include snapshot identity in graph and MCP responses.
 
+**Completed foundation:** Version 1 of the language-neutral graph interchange
+contract, repository/snapshot-scoped deterministic identifiers, structured
+evidence, resolution status, compatibility adapters, JSON Schema, and Java/C#
+examples are now available. Runtime indexing and provider namespace isolation
+remain future work.
+
 ### 5. Graph access performance
 
 - Add batch node/relationship writes as optional interfaces.

@@ -1,0 +1,26 @@
+{
+  "contract": "mcp-codegraph.graph",
+  "schemaVersion": 1,
+  "repositoryId": "repo:billing-csharp",
+  "snapshotId": "snapshot:def456",
+  "commitHash": "def456",
+  "analyzer": { "name": "future-csharp-analyzer", "version": "0.1.0", "language": "csharp" },
+  "nodes": [
+    {
+      "id": "node:csharp-invoice-service",
+      "logicalId": "csharp:class:Billing.InvoiceService",
+      "repositoryId": "repo:billing-csharp",
+      "snapshotId": "snapshot:def456",
+      "kind": "CLASS",
+      "name": "InvoiceService",
+      "qualifiedName": "Billing.InvoiceService",
+      "language": "csharp",
+      "analyzer": "future-csharp-analyzer",
+      "analyzerVersion": "0.1.0",
+      "sourceRange": { "startLine": 1, "startColumn": 0, "endLine": 30, "endColumn": 1 },
+      "metadata": { "framework": "aspnet-core" }
+    }
+  ],
+  "relationships": [],
+  "metadata": { "note": "Interchange example only; no C# analyzer is implemented." }
+}
