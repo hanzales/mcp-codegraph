@@ -4,10 +4,12 @@ services:
     profiles: [neo4j]
     ports: ["7474:7474", "7687:7687"]
     environment:
-      NEO4J_AUTH: neo4j/change-me
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:?Set NEO4J_PASSWORD before starting Neo4j}
   codegraph:
     build: .
     environment:
       SPRING_AI_MCP_SERVER_STDIO: "true"
+      CODEGRAPH_GRAPH_PROVIDER: neo4j
+      CODEGRAPH_GRAPH_PASSWORD: ${NEO4J_PASSWORD:?Set NEO4J_PASSWORD before starting CodeGraph}
     volumes:
       - .:/workspace:ro

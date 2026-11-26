@@ -7,19 +7,22 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 
 /** Registry and lifecycle boundary for isolated repositories grouped into workspaces. */
 public final class WorkspaceIndexService {
     private final RepositoryPathPolicy pathPolicy;
     private final LanguageAnalyzerSelector selector;
+    private final BiFunction<String, RepositoryDefinition, GraphRepository> graphFactory;
     private final Map<String, WorkspaceState> workspaces = new ConcurrentHashMap<>();
-    public WorkspaceIndexService(RepositoryPathPolicy pathPolicy, LanguageAnalyzerSelector selector) { this.pathPolicy = Objects.requireNonNull(pathPolicy); this.selector = Objects.requireNonNull(selector); }
+    public WorkspaceIndexService(RepositoryPathPolicy pathPolicy, LanguageAnalyzerSelector selector) { this(pathPolicy, selector, (ignoredWorkspace, ignoredRepository) -> new InMemoryGraphRepository()); }
+    public WorkspaceIndexService(RepositoryPathPolicy pathPolicy, LanguageAnalyzerSelector selector, BiFunction<String, RepositoryDefinition, GraphRepository> graphFactory) { this.pathPolicy = Objects.requireNonNull(pathPolicy); this.selector = Objects.requireNonNull(selector); this.graphFactory = Objects.requireNonNull(graphFactory); }
     public WorkspaceDefinition registerWorkspace(WorkspaceDefinition definition) { workspaces.putIfAbsent(definition.workspaceId(), new WorkspaceState(definition)); return definition; }
     public boolean removeWorkspace(String workspaceId) { return workspaces.remove(workspaceId) != null; }
     public RepositoryDefinition registerRepository(String workspaceId, RepositoryDefinition definition) throws IOException {
         var workspace = requireWorkspace(workspaceId); var canonical = pathPolicy.validate(definition.localPath());
         var normalized = new RepositoryDefinition(definition.repositoryId(), definition.displayName(), canonical.toString(), definition.language(), definition.branch(), definition.serviceIdentity(), definition.includePatterns(), definition.excludePatterns(), definition.analyzerConfiguration());
-        workspace.repositories.putIfAbsent(normalized.repositoryId(), new RepositoryState(workspaceId, normalized, canonical)); return normalized;
+        workspace.repositories.putIfAbsent(normalized.repositoryId(), new RepositoryState(workspaceId, normalized, canonical, graphFactory.apply(workspaceId, normalized))); return normalized;
     }
     public boolean removeRepository(String workspaceId, String repositoryId) { return requireWorkspace(workspaceId).repositories.remove(repositoryId) != null; }
     public RepositoryIndexStatus indexRepository(String workspaceId, String repositoryId) {
@@ -45,5 +48,5 @@ public final class WorkspaceIndexService {
     private WorkspaceState requireWorkspace(String id) { var state = workspaces.get(id); if (state == null) throw new IllegalArgumentException("Workspace is not registered"); return state; }
     private RepositoryState requireRepository(String workspaceId, String repositoryId) { var repository = requireWorkspace(workspaceId).repositories.get(repositoryId); if (repository == null) throw new IllegalArgumentException("Repository is not registered in workspace"); return repository; }
     private static final class WorkspaceState { final WorkspaceDefinition definition; final Map<String, RepositoryState> repositories = new ConcurrentHashMap<>(); WorkspaceState(WorkspaceDefinition definition) { this.definition = definition; } }
-    private static final class RepositoryState { final RepositoryDefinition definition; final Path root; final GraphRepository graph = new InMemoryGraphRepository(); volatile RepositoryIndexStatus status; RepositoryState(String workspaceId, RepositoryDefinition definition, Path root) { this.definition = definition; this.root = root; this.status = new RepositoryIndexStatus(workspaceId, definition.repositoryId(), definition.displayName(), root.toString(), definition.language(), RepositoryIndexState.REGISTERED, 0, 0, 0, 0, null, List.of(), ""); } }
+    private static final class RepositoryState { final RepositoryDefinition definition; final Path root; final GraphRepository graph; volatile RepositoryIndexStatus status; RepositoryState(String workspaceId, RepositoryDefinition definition, Path root, GraphRepository graph) { this.definition = definition; this.root = root; this.graph = graph; this.status = new RepositoryIndexStatus(workspaceId, definition.repositoryId(), definition.displayName(), root.toString(), definition.language(), RepositoryIndexState.REGISTERED, 0, 0, 0, 0, null, List.of(), ""); } }
 }

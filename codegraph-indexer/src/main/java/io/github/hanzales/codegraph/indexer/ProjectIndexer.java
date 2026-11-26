@@ -16,7 +16,9 @@ public final class ProjectIndexer {
     }
     public IndexStatus index(Path root, List<String> includePatterns, List<String> excludePatterns) throws IOException {
         var started = System.nanoTime(); var canonical = root.toRealPath(); var files = discover(canonical, includePatterns, excludePatterns); graph.clear();
-        var result = analyzer.analyze(canonical, files); result.nodes().forEach(graph::upsertNode); result.relationships().forEach(graph::addRelationship);
+        var result = analyzer.analyze(canonical, files);
+        if (graph instanceof io.github.hanzales.codegraph.graph.PersistentGraphStore persistent) { persistent.initializeSchema(); persistent.upsertNodes(result.nodes()); persistent.addRelationships(result.relationships()); }
+        else { result.nodes().forEach(graph::upsertNode); result.relationships().forEach(graph::addRelationship); }
         var repository = new GraphNode("repository:" + sha256(canonical.toString()), NodeKind.REPOSITORY, canonical.getFileName().toString(), canonical.toString(), "", 0, 0, Map.of("language", analyzer.language())); graph.upsertNode(repository);
         result.nodes().stream().filter(n -> n.kind() == NodeKind.CLASS || n.kind() == NodeKind.INTERFACE).forEach(n -> graph.addRelationship(new GraphRelationship(repository.id(), n.id(), "CONTAINS", n.file(), n.startLine(), n.endLine(), Confidence.HIGH, "indexed source file")));
         return new IndexStatus(repository.id(), canonical.toString(), "working-tree", files.size(), result.nodes().size(), result.relationships().size(), (System.nanoTime() - started) / 1_000_000, Instant.now(), result.warnings());

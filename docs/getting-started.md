@@ -13,6 +13,9 @@ start `docker compose --profile neo4j up -d neo4j` and set
 `CODEGRAPH_GRAPH_PROVIDER=neo4j` plus `CODEGRAPH_GRAPH_PASSWORD` before starting
 the server.
 
+See [`docs/neo4j-storage.md`](neo4j-storage.md) for constraints, scoped
+cleanup, health checks, and batch transaction behavior.
+
 ## Multi-repository workspace mode
 
 Workspace registration is local-only. The server never clones repositories or

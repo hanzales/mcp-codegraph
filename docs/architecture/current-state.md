@@ -97,8 +97,9 @@ resolve dependencies across repository graphs.
   expensive as symbol counts grow.
 - `InMemoryGraphRepository` uses a concurrent node map but linear relationship
   scans and an unbounded relationship list.
-- Neo4j writes are one session/transaction per operation; indexing can create a
-  very large number of network round trips.
+- Neo4j reads still open scoped sessions per operation, while indexing now has
+  batch node and relationship writes in explicit transactions. Large query
+  pagination and backpressure remain future work.
 - `GraphImpactAnalyzer` traverses only incoming edges, does not weight edge
   confidence, and uses a heuristic risk label without a formal policy model.
 - JGit symbol attribution reads the current work tree; deleted and renamed

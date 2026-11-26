@@ -87,3 +87,9 @@ future work.
 - Structured evidence compatibility layer.
 - Provider contract test suite.
 - Updated MCP tool schemas and documentation.
+
+**Completed storage foundation:** Neo4j is now an explicit interchangeable
+provider with scoped workspace/repository/snapshot keys, idempotent upserts,
+batch transactions, schema constraints/indexes, cleanup operations, statistics,
+health reporting, and explicit failure behavior. In-memory remains the default;
+durable workspace catalog persistence and revision-aware snapshots remain open.
